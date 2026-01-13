@@ -29,7 +29,7 @@ Used to enforce security and least privilege
 
 ## Key exam notes
 
-
+---
 ## Detailed Notes
 
 ### Video notes
