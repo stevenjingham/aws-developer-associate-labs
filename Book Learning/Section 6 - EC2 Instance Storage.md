@@ -26,8 +26,6 @@
 - **IAM Roles** – grant permissions to EC2 securely
 - **Availability Zones (AZs)** – physical data centres within a region
 
----
-
 ## How It Works
 - You launch an EC2 instance by choosing:
     - An **AMI** (Linux, Windows, macOS)
@@ -42,9 +40,12 @@
     - Scale manually or via **Auto Scaling Groups**
     - Assume **IAM roles** to access AWS services
 
----
-
 ## Code / Config
+
+## Common Pitfalls
+
+
+## Key Exam Notes
 
 
 ---
