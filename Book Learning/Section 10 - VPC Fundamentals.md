@@ -9,62 +9,84 @@
 ---
 
 ## Purpose
-- Provide **name resolution** by translating human-friendly domain names into IP addresses
-- Enable **high availability, failover, and traffic control** at the DNS level
-- Allow applications to scale globally by directing users to the **best endpoint**
-- Separate **domain registration** from **DNS traffic management**
+- Provide a **logically isolated private network** in AWS to deploy resources securely
+- Control **networking, routing, and access** between resources and the internet
+- Enable **secure architectures** (public-facing apps with private backends)
+- Form the foundation for most AWS services (EC2, RDS, ALB, Lambda, etc.)
 
 ## Key Concepts
-- **DNS (Domain Name System)**: Backbone of the internet that resolves hostnames to IPs
-- **Hierarchy**
-  - Root (`.`)
-  - Top-Level Domain (TLD): `.com`, `.org`
-  - Second-Level Domain (SLD): `example.com`
-  - Subdomain: `www.example.com`
-  - FQDN: `api.www.example.com`
-- **Route 53**
-  - Fully managed, highly available, scalable DNS
-  - **Authoritative DNS** (you control records)
-  - Also acts as a **Domain Registrar**
-- **Hosted Zones**
-  - Public Hosted Zone: DNS records for internet-facing domains
-  - Private Hosted Zone: DNS records only resolvable inside a VPC
-- **DNS Records**
-  - A / AAAA – hostname → IPv4 / IPv6
-  - CNAME – hostname → hostname (not root domain)
-  - Alias – Route 53 only, hostname → AWS resource
-  - NS – Name Servers for a hosted zone
-- **TTL (Time To Live)**
-  - Controls how long DNS responses are cached
-
+- **VPC (Virtual Private Cloud)**
+  - A private network in AWS
+  - **Regional** resource
+- **Subnets**
+  - Sub-divisions of a VPC
+  - **AZ-specific**
+  - Public subnet → has route to Internet Gateway
+  - Private subnet → no direct internet access
+- **Route Tables**
+  - Define where traffic is allowed to go
+  - Control access between subnets, IGW, NAT, VPC peers
+- **Internet Gateway (IGW)**
+  - Allows resources in public subnets to access the internet
+- **NAT**
+  - Allows **outbound-only internet access** from private subnets
+  - NAT Gateway (managed, recommended)
+  - NAT Instance (self-managed, legacy)
+- **Security Layers**
+  - Security Groups → instance/ENI level, allow-only, stateful
+  - NACLs → subnet level, allow + deny, stateless
+- **Connectivity**
+  - VPC Peering
+  - VPC Endpoints
+  - Site-to-Site VPN
+  - Direct Connect (DX)
 
 ## How It Works
-1. User enters a URL (e.g. `www.example.com`)
-2. Browser checks **local DNS cache**
-3. If not cached:
-  - Queries **Root DNS** → points to TLD (.com)
-  - Queries **TLD DNS** → points to authoritative NS
-  - Queries **Authoritative DNS (Route 53)** → returns record
-4. Browser connects to returned IP or AWS resource
-5. Routing policy determines **which DNS response** is returned (not traffic routing)
+- A VPC is created with a **CIDR block** (IP range)
+- Subnets divide the VPC across **Availability Zones**
+- Traffic flow is controlled by:
+  - Route tables (where traffic goes)
+  - Security Groups (instance firewall)
+  - NACLs (subnet firewall)
+- Internet access:
+  - Public subnet → route to IGW
+  - Private subnet → route to NAT → IGW
+- Private AWS access:
+  - VPC Endpoints allow access to AWS services **without using the public internet**
+- On-prem connectivity:
+  - VPN → encrypted, over public internet
+  - Direct Connect → physical, private, high throughput
 
 ## Code / Config
 
 ## Common Pitfalls
 
 ## Key exam notes
-- Route 53 is **authoritative DNS** and a **domain registrar**
-- Alias records:
-  - Route 53 only
-  - Work at root domain
-  - Free queries
-- Health checks enable **Automated DNS Failover**
-- Routing policies decide **DNS response**, not packet routing
-- IP-based routing requires **known client CIDR ranges**
-- Private Hosted Zones only work **inside a VPC**
-- Multi-Value routing returns up to **8 healthy records**
----
-
+- VPC = **regional**, Subnet = **AZ**
+- Public subnet = route to **Internet Gateway**
+- Private subnet + internet access = **NAT Gateway**
+- Security Groups:
+  - Allow-only
+  - Stateful
+  - Instance/ENI level
+- NACLs:
+  - Allow + Deny
+  - Stateless
+  - Subnet level
+- VPC Peering:
+  - No overlapping CIDRs
+  - Not transitive
+- VPC Endpoints:
+  - Gateway Endpoint → S3, DynamoDB
+  - Interface Endpoint → most other services
+- Direct Connect:
+  - Private, fast, expensive, slow to provision
+- Typical 2-tier architecture:
+  - Public subnet → ALB
+  - Private subnet → EC2 ASG
+  - Data subnet → RDS / ElastiCache
+- LAMP stack:
+  - Linux, Apache, MySQL, PHP
 ## Detailed Notes
 
 ### Video notes
